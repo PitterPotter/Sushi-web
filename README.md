@@ -1,64 +1,86 @@
 # Sushi-web
 
-Website and reservation system for Kaiseki, an Edomae sushi restaurant.
+Website and reservation system for Kaiseki, an Edomae sushi restaurant. Built with
+Next.js (App Router) and Supabase, deployed on Vercel.
 
-- `index.html` — home
-- `booking.html` — reservations with live seat availability (12 seats, two seatings)
-- `contact.html` — contact form, hours, map
-- `admin.html` — staff dashboard (login required)
+| Route      | Purpose                                                        |
+|------------|----------------------------------------------------------------|
+| `/`        | Home                                                           |
+| `/booking` | Reservations with live seat availability (12 seats, 2 seatings)|
+| `/contact` | Contact form, hours, map                                       |
+| `/admin`   | Staff dashboard (Supabase Auth login required)                 |
 
-Static HTML/CSS/JS, no build step. Data and auth are handled by Supabase; hosted on Vercel.
+## Project layout
+
+```
+src/
+  app/
+    layout.js            root layout, fonts, metadata
+    globals.css          site styles
+    (site)/              public pages with Header/Footer
+      page.js            home
+      booking/page.js
+      contact/page.js
+    admin/               dashboard (own styles, no site chrome)
+  components/            Header, Footer, Reveal, BookingForm, ContactForm, admin/*
+  lib/
+    supabase.js          client + RPC helpers
+    format.js            date/time helpers
+supabase/schema.sql      database schema, RLS, RPC functions
+```
 
 ## Setup
 
 ### 1. Database
 
-In the Supabase dashboard open **SQL Editor → New query**, paste the contents of
-`supabase/schema.sql` and run it. This creates:
+In the Supabase dashboard open **SQL Editor → New query**, paste `supabase/schema.sql`
+and run it. This creates the `reservations`, `contact_messages` and `settings` tables
+(with Row Level Security) plus RPCs:
 
-- `reservations`, `contact_messages`, `settings` tables with Row Level Security
-- `get_availability(date)` and `create_reservation(...)` — public RPCs that enforce the
-  12-seat capacity per seating atomically
-- `submit_contact(...)` — public RPC for the contact form
-- `admin_stats()` — dashboard numbers (authenticated only)
+- `get_availability(date)` / `create_reservation(...)` — public, enforce capacity atomically
+- `submit_contact(...)` — public
+- `admin_stats()` — authenticated only
 
-Capacity, seating times and closed weekdays live in the `settings` table and can be
-edited there without touching code.
+Capacity, seating times and closed weekdays live in `settings` and can be changed there.
 
-### 2. Credentials
+### 2. Environment variables
 
-Copy the **Project URL** and **anon public** key from **Project Settings → API** into
-`js/config.js`. The anon key is safe to ship to browsers; all writes go through the RPCs
-and the tables are protected by RLS.
+```
+cp .env.example .env.local
+```
+
+Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from
+**Project Settings → API**. Add the same two variables in Vercel → Project → Settings →
+Environment Variables. The anon key is safe in the browser; writes go through RPCs and
+tables are protected by RLS.
 
 ### 3. Admin user
 
-**Authentication → Users → Add user**. Create an email/password user for each staff
-member. Any authenticated user has full access to the dashboard, so only create accounts
-for staff. Under **Authentication → Providers → Email**, you may want to turn off
-*"Allow new users to sign up"* so nobody can self-register.
+**Authentication → Users → Add user** for each staff member. Any authenticated user has
+full dashboard access, so disable *"Allow new users to sign up"* under
+Authentication → Providers → Email.
 
-### 4. Deploy
-
-Push to `main`; Vercel deploys automatically. Locally:
+### 4. Run
 
 ```
-python3 -m http.server 8080
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build
 ```
 
-Then open <http://localhost:8080> and <http://localhost:8080/admin.html>.
+Push to `main` and Vercel deploys automatically.
 
 ## Reservation flow
 
 1. Guest picks a date → `get_availability` returns seats remaining per seating; full or
-   closed seatings are disabled in the dropdown.
-2. Guest submits → `create_reservation` re-checks capacity inside a transaction lock and
+   closed seatings are disabled.
+2. Guest submits → `create_reservation` re-checks capacity under a transaction lock and
    inserts with status `pending`.
-3. Staff confirm, decline, seat, or mark no-show from `admin.html`. Only `pending`,
+3. Staff confirm, decline, seat, or mark no-show from `/admin`. Only `pending`,
    `confirmed` and `seated` bookings count toward capacity.
 
 ## Not yet included
 
-- Email notifications to guests (confirm/decline). Easiest route: a Supabase Database
-  Webhook on `reservations` → Resend/Postmark, or an Edge Function.
+- Email notifications to guests. Easiest route: Supabase Database Webhook on
+  `reservations` → Resend/Postmark, or a Next.js Route Handler.
 - Card holds / deposits.
