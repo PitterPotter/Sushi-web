@@ -83,6 +83,7 @@
                 </select>
               </div>
             </div>
+            <p id="availability" class="form-hint" hidden></p>
             <div class="form-row">
               <div class="field">
                 <label for="seating">Preference</label>
@@ -106,6 +107,7 @@
               <label for="notes">Dietary notes &amp; occasions</label>
               <textarea id="notes" name="notes" placeholder="Allergies, aversions, anniversaries…"></textarea>
             </div>
+            <p class="form-error" role="alert" hidden></p>
             <div class="form-footer">
               <p class="form-note">A card is required to hold your seats. Cancellations within 48 hours incur a $75 per-guest fee.</p>
               <button type="submit" class="btn btn-solid">Request Reservation</button>
@@ -190,6 +192,9 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

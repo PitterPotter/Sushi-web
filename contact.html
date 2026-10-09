@@ -92,6 +92,7 @@
               <label for="message">Message</label>
               <textarea id="message" name="message" placeholder="How can we help?" required></textarea>
             </div>
+            <p class="form-error" role="alert" hidden></p>
             <div class="form-footer">
               <p class="form-note">We reply within two business days. For same-day matters, please telephone.</p>
               <button type="submit" class="btn btn-solid">Send Message</button>
@@ -163,6 +164,9 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

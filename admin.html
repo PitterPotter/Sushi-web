@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Kaiseki Sushi</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+
+  <!-- Login -->
+  <section id="login-view" class="login-view" hidden>
+    <form id="login-form" class="login-card form">
+      <a href="index.html" class="brand">
+        <span class="brand-mark">懐</span>
+        <span class="brand-name">Kaiseki<small>Admin</small></span>
+      </a>
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" name="email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" required autocomplete="current-password">
+      </div>
+      <p class="form-error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-solid">Sign In</button>
+    </form>
+  </section>
+
+  <!-- Dashboard -->
+  <div id="app-view" class="app" hidden>
+    <aside class="sidebar">
+      <a href="index.html" class="brand">
+        <span class="brand-mark">懐</span>
+        <span class="brand-name">Kaiseki<small>Admin</small></span>
+      </a>
+      <nav class="side-nav">
+        <button class="side-link active" data-view="overview">Overview</button>
+        <button class="side-link" data-view="reservations">Reservations <span class="pill" id="pill-pending" hidden></span></button>
+        <button class="side-link" data-view="messages">Messages <span class="pill" id="pill-messages" hidden></span></button>
+      </nav>
+      <div class="side-foot">
+        <span id="user-email" class="small"></span>
+        <button id="logout" class="link-btn">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- Overview -->
+      <section data-panel="overview" class="panel">
+        <header class="panel-head">
+          <div><span class="eyebrow">Overview</span><h2 id="today-label"></h2></div>
+          <button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>
+        </header>
+        <div class="stats">
+          <div class="stat"><span>Tonight's covers</span><strong id="stat-tonight">–</strong><small id="stat-tonight-parties"></small></div>
+          <div class="stat"><span>Next 7 days</span><strong id="stat-week">–</strong><small>covers booked</small></div>
+          <div class="stat"><span>Pending requests</span><strong id="stat-pending">–</strong><small>awaiting confirmation</small></div>
+          <div class="stat"><span>Unread messages</span><strong id="stat-messages">–</strong><small>in the inbox</small></div>
+        </div>
+        <h3 class="sub-head">Tonight's seatings</h3>
+        <div id="tonight-seatings" class="seatings"></div>
+        <h3 class="sub-head">Needs attention</h3>
+        <div id="pending-list" class="table-wrap"></div>
+      </section>
+
+      <!-- Reservations -->
+      <section data-panel="reservations" class="panel" hidden>
+        <header class="panel-head">
+          <div><span class="eyebrow">Reservations</span><h2>All bookings</h2></div>
+          <button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>
+        </header>
+        <div class="filters">
+          <div class="field"><label>From</label><input type="date" id="f-from"></div>
+          <div class="field"><label>To</label><input type="date" id="f-to"></div>
+          <div class="field"><label>Status</label>
+            <select id="f-status">
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="seated">Seated</option>
+              <option value="declined">Declined</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="no_show">No-show</option>
+            </select>
+          </div>
+          <div class="field"><label>Search</label><input type="search" id="f-q" placeholder="Name, email or phone"></div>
+        </div>
+        <div id="reservations-list" class="table-wrap"></div>
+      </section>
+
+      <!-- Messages -->
+      <section data-panel="messages" class="panel" hidden>
+        <header class="panel-head">
+          <div><span class="eyebrow">Messages</span><h2>Inbox</h2></div>
+          <button class="btn btn-ghost btn-sm" data-refresh>Refresh</button>
+        </header>
+        <div id="messages-list" class="messages"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Reservation detail drawer -->
+  <div id="drawer" class="drawer" hidden>
+    <div class="drawer-backdrop" data-close></div>
+    <div class="drawer-panel">
+      <button class="drawer-close" data-close aria-label="Close">×</button>
+      <div id="drawer-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
