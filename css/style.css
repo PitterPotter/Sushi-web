@@ -1,14 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
 
-@font-face {
-  font-family: 'Sweetie Pie';
-  src: local('Sweetie Pie'), local('SweetiePie'), local('SJ Sweetie Pie'),
-       url('../fonts/SweetiePie.woff2') format('woff2'),
-       url('../fonts/SweetiePie.woff') format('woff'),
-       url('../fonts/SweetiePie.ttf') format('truetype');
-  font-display: swap;
-}
-
 :root {
   --ink: #0b1f16;
   --charcoal: #112a1e;
@@ -20,8 +11,8 @@
   --gold-soft: #e0c98a;
   --vermilion: #a83f2e;
   --line: rgba(243, 238, 230, 0.12);
-  --serif: 'Sweetie Pie', 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Sweetie Pie', 'Inter', -apple-system, Helvetica, sans-serif;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter', -apple-system, Helvetica, sans-serif;
   --max: 1200px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
