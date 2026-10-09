@@ -1,18 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
 
+@font-face {
+  font-family: 'Sweetie Pie';
+  src: local('Sweetie Pie'), local('SweetiePie'), local('SJ Sweetie Pie'),
+       url('../fonts/SweetiePie.woff2') format('woff2'),
+       url('../fonts/SweetiePie.woff') format('woff'),
+       url('../fonts/SweetiePie.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root {
-  --ink: #0e0e0e;
-  --charcoal: #171717;
-  --slate: #242424;
+  --ink: #0b1f16;
+  --charcoal: #112a1e;
+  --slate: #183627;
   --paper: #f3eee6;
   --paper-dim: #c9c2b6;
-  --muted: #8a8378;
+  --muted: #8a9a8c;
   --gold: #c9a961;
   --gold-soft: #e0c98a;
   --vermilion: #a83f2e;
   --line: rgba(243, 238, 230, 0.12);
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Inter', -apple-system, Helvetica, sans-serif;
+  --serif: 'Sweetie Pie', 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Sweetie Pie', 'Inter', -apple-system, Helvetica, sans-serif;
   --max: 1200px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -85,7 +94,7 @@ h3 { font-size: 1.75rem; }
   border-bottom: 1px solid transparent;
 }
 .header.scrolled {
-  background: rgba(14, 14, 14, 0.88);
+  background: rgba(11, 31, 22, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding-block: 1.1rem;
@@ -155,13 +164,13 @@ h3 { font-size: 1.75rem; }
   background:
     radial-gradient(ellipse 60% 50% at 70% 40%, rgba(201, 169, 97, 0.14), transparent 60%),
     radial-gradient(ellipse 40% 40% at 20% 80%, rgba(168, 63, 46, 0.12), transparent 60%),
-    linear-gradient(180deg, #121212 0%, var(--ink) 100%);
+    linear-gradient(180deg, var(--charcoal) 0%, var(--ink) 100%);
 }
 .hero-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.42; filter: saturate(0.8) contrast(1.05); }
 .hero-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(14,14,14,0.3) 0%, rgba(14,14,14,0.2) 50%, var(--ink) 100%);
+  background: linear-gradient(180deg, rgba(11,31,22,0.3) 0%, rgba(11,31,22,0.2) 50%, var(--ink) 100%);
 }
 .hero-kanji {
   position: absolute; right: -2vw; top: 50%; transform: translateY(-50%);
