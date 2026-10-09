@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservations — Kaiseki Sushi</title>
+  <meta name="description" content="Reserve a seat at the Kaiseki omakase counter. Two seatings nightly, Tuesday through Saturday.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container">
+      <a href="index.html" class="brand">
+        <span class="brand-mark">懐</span>
+        <span class="brand-name">Kaiseki<small>Edomae Sushi</small></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Reservations</a>
+        <a href="contact.html">Contact</a>
+        <a href="booking.html" class="btn">Reserve a Seat</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="hero-bg">
+        <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=2000&q=80" alt="">
+      </div>
+      <div class="container">
+        <span class="eyebrow">Reservations</span>
+        <h1>Take a seat<br>at the counter</h1>
+        <p class="lead">Twelve seats, two seatings, Tuesday through Saturday. Please allow approximately two hours for the omakase.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container booking-grid">
+        <div>
+          <form id="booking-form" class="form" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="name">Full name</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required autocomplete="name">
+              </div>
+              <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="+1 (212) 000 0000" required autocomplete="tel">
+              </div>
+              <div class="field">
+                <label for="guests">Guests</label>
+                <select id="guests" name="guests" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="1">1 guest</option>
+                  <option value="2">2 guests</option>
+                  <option value="3">3 guests</option>
+                  <option value="4">4 guests</option>
+                  <option value="5">5 guests</option>
+                  <option value="6">6 guests — full counter side</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+              </div>
+              <div class="field">
+                <label for="time">Seating</label>
+                <select id="time" name="time" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="17:30">First seating — 5:30 PM</option>
+                  <option value="20:30">Second seating — 8:30 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="seating">Preference</label>
+                <select id="seating" name="seating">
+                  <option value="">No preference</option>
+                  <option value="counter">Counter — in front of the chef</option>
+                  <option value="alcove">Private alcove (4–6 guests)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="menu">Omakase</label>
+                <select id="menu" name="menu">
+                  <option value="">Decide at the counter</option>
+                  <option value="hana">Hana — $185</option>
+                  <option value="tsuki">Tsuki — $245</option>
+                  <option value="yuki">Yuki — $320</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="notes">Dietary notes &amp; occasions</label>
+              <textarea id="notes" name="notes" placeholder="Allergies, aversions, anniversaries…"></textarea>
+            </div>
+            <div class="form-footer">
+              <p class="form-note">A card is required to hold your seats. Cancellations within 48 hours incur a $75 per-guest fee.</p>
+              <button type="submit" class="btn btn-solid">Request Reservation</button>
+            </div>
+          </form>
+
+          <div id="confirm" class="confirm" role="status" aria-live="polite">
+            <div class="mark">承</div>
+            <h2>Request received</h2>
+            <p id="confirm-text"></p>
+            <br>
+            <a href="index.html" class="btn btn-ghost">Return Home</a>
+          </div>
+        </div>
+
+        <aside class="aside-card reveal">
+          <h3>Before you arrive</h3>
+          <dl>
+            <div>
+              <dt>Seatings</dt>
+              <dd>5:30 PM and 8:30 PM, Tuesday through Saturday. Please arrive ten minutes early; the counter begins together.</dd>
+            </div>
+            <div>
+              <dt>Duration</dt>
+              <dd>Approximately two hours for the full omakase progression.</dd>
+            </div>
+            <div>
+              <dt>Dietary</dt>
+              <dd>We can accommodate most allergies with 48 hours' notice. We are unable to offer vegetarian omakase.</dd>
+            </div>
+            <div>
+              <dt>Dress</dt>
+              <dd>Smart casual. We kindly ask guests to refrain from strong fragrances, which affect the tasting of the fish.</dd>
+            </div>
+          </dl>
+          <hr>
+          <p class="small">For parties larger than six, or full buyouts of the counter, please <a href="contact.html" style="color:var(--gold)">contact us directly</a>.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a href="index.html" class="brand">
+            <span class="brand-mark">懐</span>
+            <span class="brand-name">Kaiseki<small>Edomae Sushi</small></span>
+          </a>
+          <p>A twelve-seat sushi counter in SoHo devoted to the Edomae tradition. Reservations are released on the first of each month.</p>
+        </div>
+        <div>
+          <h4>Visit</h4>
+          <ul>
+            <li>14 Rue Mercer</li>
+            <li>New York, NY 10012</li>
+            <li><a href="contact.html">Directions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <ul>
+            <li>Tue – Sat</li>
+            <li>5:30 PM &amp; 8:30 PM</li>
+            <li>Closed Sun &amp; Mon</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Menu</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="booking.html">Reservations</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Kaiseki Sushi</span>
+        <span>Omakase only · Smart casual</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
