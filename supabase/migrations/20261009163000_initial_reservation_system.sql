@@ -1,9 +1,6 @@
--- Kaiseki Sushi — reservation system schema
--- Run this once in the Supabase SQL editor (Dashboard → SQL Editor → New query).
+-- Initial Kaiseki reservation system schema.
+-- Applied to the linked Supabase project via Supabase CLI.
 
--- ---------------------------------------------------------------------------
--- Settings
--- ---------------------------------------------------------------------------
 create table if not exists public.settings (
   key   text primary key,
   value jsonb not null
@@ -12,12 +9,9 @@ create table if not exists public.settings (
 insert into public.settings (key, value) values
   ('capacity', '12'),
   ('seatings', '["17:30", "20:30"]'),
-  ('closed_weekdays', '[0, 1]')               -- 0 = Sunday, 1 = Monday
+  ('closed_weekdays', '[0, 1]')
 on conflict (key) do nothing;
 
--- ---------------------------------------------------------------------------
--- Reservations
--- ---------------------------------------------------------------------------
 do $$ begin
   create type public.reservation_status as enum ('pending', 'confirmed', 'declined', 'cancelled', 'seated', 'no_show');
 exception when duplicate_object then null; end $$;
@@ -41,9 +35,6 @@ create table if not exists public.reservations (
 create index if not exists reservations_date_idx on public.reservations (date, seating);
 create index if not exists reservations_status_idx on public.reservations (status);
 
--- ---------------------------------------------------------------------------
--- Contact messages
--- ---------------------------------------------------------------------------
 create table if not exists public.contact_messages (
   id         uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -54,48 +45,19 @@ create table if not exists public.contact_messages (
   read       boolean not null default false
 );
 
--- ---------------------------------------------------------------------------
--- Row Level Security
--- Public users go through the RPC functions below. Admin data access is proxied
--- through the server-only service role key.
--- ---------------------------------------------------------------------------
 alter table public.settings         enable row level security;
 alter table public.reservations     enable row level security;
 alter table public.contact_messages enable row level security;
 
-drop policy if exists "admins full access to settings" on public.settings;
-drop policy if exists "admins full access to reservations" on public.reservations;
-drop policy if exists "admins full access to contact messages" on public.contact_messages;
+create policy "admins full access to settings"
+  on public.settings for all to authenticated using (true) with check (true);
 
-grant all on public.settings, public.reservations, public.contact_messages to service_role;
+create policy "admins full access to reservations"
+  on public.reservations for all to authenticated using (true) with check (true);
 
-create table if not exists public.admin_login_attempts (
-  id         uuid primary key default gen_random_uuid(),
-  ip_hash    text not null,
-  created_at timestamptz not null default now()
-);
+create policy "admins full access to contact messages"
+  on public.contact_messages for all to authenticated using (true) with check (true);
 
-create index if not exists admin_login_attempts_ip_created_idx on public.admin_login_attempts (ip_hash, created_at);
-alter table public.admin_login_attempts enable row level security;
-grant all on public.admin_login_attempts to service_role;
-revoke all on public.admin_login_attempts from anon, authenticated;
-
-create table if not exists public.admin_sessions (
-  session_hash text primary key,
-  username     text not null,
-  created_at   timestamptz not null default now(),
-  expires_at   timestamptz not null
-);
-
-create index if not exists admin_sessions_expires_idx on public.admin_sessions (expires_at);
-alter table public.admin_sessions enable row level security;
-grant all on public.admin_sessions to service_role;
-revoke all on public.admin_sessions from anon, authenticated;
-
--- ---------------------------------------------------------------------------
--- Public RPC: availability for a given date
--- Returns each seating with seats remaining. Blocked statuses don't count.
--- ---------------------------------------------------------------------------
 create or replace function public.get_availability(p_date date)
 returns table (seating time, capacity int, booked int, remaining int, closed boolean)
 language sql
@@ -131,9 +93,6 @@ $$;
 
 grant execute on function public.get_availability(date) to anon, authenticated;
 
--- ---------------------------------------------------------------------------
--- Public RPC: create a reservation (capacity enforced atomically)
--- ---------------------------------------------------------------------------
 create or replace function public.create_reservation(
   p_name text, p_email text, p_phone text, p_guests int,
   p_date date, p_seating time, p_preference text default null,
@@ -152,7 +111,6 @@ begin
     raise exception 'Parties must be between 1 and 6 guests.' using errcode = 'P0001';
   end if;
 
-  -- Serialise bookings for the same date/seating so two people can't take the last seats at once.
   perform pg_advisory_xact_lock(hashtext(p_date::text || p_seating::text));
 
   select * into v_avail from public.get_availability(p_date) a where a.seating = p_seating;
@@ -178,9 +136,6 @@ $$;
 
 grant execute on function public.create_reservation(text, text, text, int, date, time, text, text, text) to anon, authenticated;
 
--- ---------------------------------------------------------------------------
--- Public RPC: submit a contact message
--- ---------------------------------------------------------------------------
 create or replace function public.submit_contact(
   p_name text, p_email text, p_subject text, p_message text
 )
@@ -203,9 +158,6 @@ $$;
 
 grant execute on function public.submit_contact(text, text, text, text) to anon, authenticated;
 
--- ---------------------------------------------------------------------------
--- Admin RPC: dashboard stats
--- ---------------------------------------------------------------------------
 create or replace function public.admin_stats()
 returns jsonb
 language sql
@@ -222,5 +174,4 @@ as $$
   );
 $$;
 
-revoke execute on function public.admin_stats() from anon, authenticated;
-grant execute on function public.admin_stats() to service_role;
+grant execute on function public.admin_stats() to authenticated;

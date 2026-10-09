@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, unwrap } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import { formatDateTime } from '@/lib/format';
 import { PanelHead } from './shared';
 import { useToast } from './Toast';
@@ -11,13 +11,12 @@ export default function Messages({ tick, onRefresh }) {
   const toast = useToast();
 
   useEffect(() => {
-    supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(100)
-      .then(unwrap).then(setRows).catch((e) => toast(e.message, true));
+    adminFetch('/api/admin/messages').then(setRows).catch((e) => toast(e.message, true));
   }, [tick, toast]);
 
-  const run = async (promise) => {
+  const run = async (request) => {
     try {
-      await promise.then(unwrap);
+      await request();
       onRefresh();
     } catch (e) {
       toast(e.message, true);
@@ -39,11 +38,11 @@ export default function Messages({ tick, onRefresh }) {
             <span className="meta">{m.subject}</span>
             <p>{m.message}</p>
             <footer>
-              <button className="link-btn" onClick={() => run(supabase.from('contact_messages').update({ read: !m.read }).eq('id', m.id))}>
+              <button className="link-btn" onClick={() => run(() => adminFetch(`/api/admin/messages/${m.id}`, { method: 'PATCH', body: JSON.stringify({ read: !m.read }) }))}>
                 {m.read ? 'Mark unread' : 'Mark read'}
               </button>
               <a className="link-btn" href={`mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.subject}`)}`}>Reply</a>
-              <button className="link-btn" onClick={() => confirm(`Delete message from ${m.name}?`) && run(supabase.from('contact_messages').delete().eq('id', m.id))}>
+              <button className="link-btn" onClick={() => confirm(`Delete message from ${m.name}?`) && run(() => adminFetch(`/api/admin/messages/${m.id}`, { method: 'DELETE' }))}>
                 Delete
               </button>
             </footer>

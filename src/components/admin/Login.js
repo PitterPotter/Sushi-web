@@ -1,21 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import Brand from '@/components/Brand';
 
-export default function Login() {
-  const [error, setError] = useState('');
+export default function Login({ onSuccess, initialError = '' }) {
+  const [error, setError] = useState(initialError);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e) {
     e.preventDefault();
     setError('');
     setBusy(true);
-    const { email, password } = Object.fromEntries(new FormData(e.currentTarget));
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    setBusy(false);
+    const { username, password } = Object.fromEntries(new FormData(e.currentTarget));
+    try {
+      const session = await adminFetch('/api/admin/auth', { method: 'POST', body: JSON.stringify({ username, password }) });
+      onSuccess(session);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -23,8 +28,8 @@ export default function Login() {
       <form className="login-card form" onSubmit={onSubmit}>
         <Brand sub="Admin" />
         <div className="field">
-          <label htmlFor="login-email">Email</label>
-          <input type="email" id="login-email" name="email" required autoComplete="username" />
+          <label htmlFor="login-username">Username</label>
+          <input type="text" id="login-username" name="username" required autoComplete="username" />
         </div>
         <div className="field">
           <label htmlFor="login-password">Password</label>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { isConfigured, supabase, unwrap } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import Brand from '@/components/Brand';
 import Login from './Login';
 import Overview from './Overview';
@@ -17,17 +17,6 @@ const VIEWS = [
 ];
 
 export default function AdminApp() {
-  if (!isConfigured) {
-    return (
-      <div className="login-view">
-        <div className="login-card">
-          <p className="form-error">
-            Supabase is not configured. Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in <code>.env.local</code>.
-          </p>
-        </div>
-      </div>
-    );
-  }
   return (
     <ToastProvider>
       <Shell />
@@ -37,6 +26,7 @@ export default function AdminApp() {
 
 function Shell() {
   const [session, setSession] = useState(undefined);
+  const [authError, setAuthError] = useState('');
   const [view, setView] = useState('overview');
   const [stats, setStats] = useState(null);
   const [tick, setTick] = useState(0);
@@ -44,20 +34,35 @@ function Shell() {
   const toast = useToast();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => sub.subscription.unsubscribe();
+    adminFetch('/api/admin/auth')
+      .then((result) => setSession(result.authenticated ? result : null))
+      .catch((error) => { setAuthError(error.message); setSession(null); });
   }, []);
 
   const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
     if (!session) return;
-    supabase.rpc('admin_stats').then(unwrap).then(setStats).catch((e) => toast(e.message, true));
+    adminFetch('/api/admin/stats')
+      .then(setStats)
+      .catch((error) => {
+        toast(error.message, true);
+        if (error.message === 'Authentication required.') setSession(null);
+      });
   }, [session, tick, toast]);
 
+  async function signOut() {
+    try {
+      await adminFetch('/api/admin/auth', { method: 'DELETE' });
+      setSession(null);
+      setStats(null);
+    } catch (error) {
+      toast(error.message, true);
+    }
+  }
+
   if (session === undefined) return null;
-  if (!session) return <Login />;
+  if (!session) return <Login initialError={authError} onSuccess={(next) => { setAuthError(''); setSession(next); refresh(); }} />;
 
   return (
     <div className="app">
@@ -72,8 +77,8 @@ function Shell() {
           ))}
         </nav>
         <div className="side-foot">
-          <span className="small">{session.user.email}</span>
-          <button className="link-btn" onClick={() => supabase.auth.signOut()}>Sign out</button>
+          <span className="small">{session.username}</span>
+          <button className="link-btn" onClick={signOut}>Sign out</button>
         </div>
       </aside>
 

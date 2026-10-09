@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, unwrap } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import { formatDate, formatDateTime, formatTime } from '@/lib/format';
 import { STATUS_LABEL, StatusBadge } from './shared';
 import { useToast } from './Toast';
@@ -24,7 +24,7 @@ export default function ReservationDrawer({ id, onClose, onChanged }) {
   const toast = useToast();
 
   useEffect(() => {
-    supabase.from('reservations').select('*').eq('id', id).single().then(unwrap)
+    adminFetch(`/api/admin/reservations/${id}`)
       .then((row) => { setR(row); setNotes(row.admin_notes || ''); })
       .catch((e) => { toast(e.message, true); onClose(); });
   }, [id, toast, onClose]);
@@ -37,7 +37,7 @@ export default function ReservationDrawer({ id, onClose, onChanged }) {
 
   async function update(patch, msg) {
     try {
-      await supabase.from('reservations').update(patch).eq('id', id).then(unwrap);
+      await adminFetch(`/api/admin/reservations/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
       toast(msg);
       onChanged();
       onClose();

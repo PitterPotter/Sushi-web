@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, unwrap } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import { addDays, today } from '@/lib/format';
 import { PanelHead, ReservationTable, STATUS_LABEL } from './shared';
 import { useToast } from './Toast';
@@ -14,13 +14,8 @@ export default function Reservations({ tick, onRefresh, onOpen }) {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      let q = supabase.from('reservations').select('*').order('date').order('seating').order('created_at');
-      if (filters.from) q = q.gte('date', filters.from);
-      if (filters.to) q = q.lte('date', filters.to);
-      if (filters.status) q = q.eq('status', filters.status);
-      const term = filters.q.trim().replace(/[,%()]/g, '');
-      if (term) q = q.or(`name.ilike.%${term}%,email.ilike.%${term}%,phone.ilike.%${term}%`);
-      q.limit(300).then(unwrap).then(setRows).catch((e) => toast(e.message, true));
+      const params = new URLSearchParams(filters);
+      adminFetch(`/api/admin/reservations?${params}`).then(setRows).catch((e) => toast(e.message, true));
     }, 250);
     return () => clearTimeout(t);
   }, [filters, tick, toast]);

@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase, unwrap, getAvailability } from '@/lib/supabase';
+import { adminFetch } from '@/lib/admin-client';
 import { formatTime, today } from '@/lib/format';
-import { ACTIVE_STATUSES, PanelHead, ReservationTable, StatusBadge } from './shared';
+import { PanelHead, ReservationTable, StatusBadge } from './shared';
 import { useToast } from './Toast';
 
 export default function Overview({ stats, tick, onRefresh, onOpen }) {
@@ -14,12 +14,12 @@ export default function Overview({ stats, tick, onRefresh, onOpen }) {
 
   useEffect(() => {
     const d = today();
-    Promise.all([
-      getAvailability(d),
-      supabase.from('reservations').select('*').eq('date', d).in('status', ACTIVE_STATUSES).order('seating').then(unwrap),
-      supabase.from('reservations').select('*').eq('status', 'pending').gte('date', d).order('date').order('seating').limit(20).then(unwrap),
-    ])
-      .then(([a, t, p]) => { setAvail(a); setTonight(t); setPending(p); })
+    adminFetch(`/api/admin/overview?date=${encodeURIComponent(d)}`)
+      .then(({ availability, tonight: reservations, pending: requests }) => {
+        setAvail(availability);
+        setTonight(reservations);
+        setPending(requests);
+      })
       .catch((e) => toast(e.message, true));
   }, [tick, toast]);
 
